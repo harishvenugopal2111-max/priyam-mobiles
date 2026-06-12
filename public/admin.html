@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Priyam Mobiles</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <!-- Custom Design System styling -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin-body">
+
+  <!-- ========================================================= -->
+  <!-- 1. LOGIN OVERLAY (Shown if not authenticated) -->
+  <!-- ========================================================= -->
+  <div id="login-container" class="d-flex align-items-center justify-content-center min-vh-100 px-3">
+    <div class="glass-panel p-4 p-sm-5 text-center shadow-lg" style="max-width: 450px; width: 100%; border-color: rgba(255,255,255,0.15);">
+      <div class="mb-4">
+        <i class="fa-solid fa-mobile-screen-button text-primary fs-1 mb-2"></i>
+        <h2 class="fw-bold text-light" style="font-family: 'Outfit', sans-serif;">PRIYAM MOBILES</h2>
+        <span class="badge bg-warning text-dark px-3 py-1 fw-bold rounded-pill text-uppercase">Management Portal</span>
+      </div>
+      
+      <div id="login-error-alert" class="alert alert-danger d-none py-2 text-center" role="alert" style="font-size: 0.85rem;">
+        Invalid username or password.
+      </div>
+      
+      <form onsubmit="handleLogin(event)">
+        <div class="mb-3 text-start">
+          <label for="login-username" class="form-label text-muted small">Username</label>
+          <div class="position-relative">
+            <input type="text" class="form-control form-control-premium ps-4 text-light" id="login-username" placeholder="e.g. admin" required>
+            <i class="fa-solid fa-user text-muted position-absolute" style="top: 13px; left: 14px; font-size: 0.9rem;"></i>
+          </div>
+        </div>
+        
+        <div class="mb-4 text-start">
+          <label for="login-password" class="form-label text-muted small">Password</label>
+          <div class="position-relative">
+            <input type="password" class="form-control form-control-premium ps-4 text-light" id="login-password" placeholder="••••••••" required>
+            <i class="fa-solid fa-lock text-muted position-absolute" style="top: 13px; left: 14px; font-size: 0.9rem;"></i>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-primary-premium w-100 py-2.5 justify-content-center">
+          <i class="fa-solid fa-right-to-bracket"></i> Secure Access
+        </button>
+      </form>
+      
+      <div class="mt-4 pt-3 border-top" style="border-color: var(--border-color) !important;">
+        <p class="text-muted small mb-0">Authorized Staff & Admin Login Only</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 2. MAIN DASHBOARD LAYOUT (Shown if authenticated) -->
+  <!-- ========================================================= -->
+  <div id="dashboard-container" class="admin-layout d-none">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand d-flex align-items-center">
+        <i class="fa-solid fa-gear text-primary me-2"></i>
+        <span>PRIYAM <span class="text-warning">PORTAL</span></span>
+      </div>
+      
+      <ul class="sidebar-menu">
+        <li>
+          <a class="menu-item-link active" onclick="switchTab('analytics')">
+            <i class="fa-solid fa-chart-pie"></i> Dashboard Stats
+          </a>
+        </li>
+        <li>
+          <a class="menu-item-link" onclick="switchTab('inventory')">
+            <i class="fa-solid fa-boxes-stacked"></i> Inventory (Mobiles)
+          </a>
+        </li>
+        <li>
+          <a class="menu-item-link" onclick="switchTab('customers')">
+            <i class="fa-solid fa-users-gear"></i> Customer CRM
+          </a>
+        </li>
+        <li>
+          <a class="menu-item-link" onclick="switchTab('billing')">
+            <i class="fa-solid fa-file-invoice-dollar"></i> POS Billing
+          </a>
+        </li>
+        <li>
+          <a class="menu-item-link" onclick="switchTab('services')">
+            <i class="fa-solid fa-screwdriver-wrench"></i> Repairs / Service
+          </a>
+        </li>
+        <li>
+          <a class="menu-item-link" onclick="switchTab('marketing')">
+            <i class="fa-solid fa-bullhorn"></i> Marketing Hub
+          </a>
+        </li>
+        <li>
+          <a class="menu-item-link" onclick="switchTab('reports')">
+            <i class="fa-solid fa-file-lines"></i> Reports Module
+          </a>
+        </li>
+      </ul>
+      
+      <!-- Logged in User widget & Sign out -->
+      <div class="p-3 border-top d-flex flex-column gap-2" style="border-color: var(--border-color) !important;">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div>
+            <p class="small text-light fw-bold mb-0 text-truncate" id="user-display-name" style="max-width: 140px;">Staff Member</p>
+            <span class="badge bg-secondary text-uppercase" id="user-display-role" style="font-size: 0.65rem;">Employee</span>
+          </div>
+          <button class="theme-toggle-btn" id="admin-theme-toggle" title="Toggle Light/Dark Theme">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+        </div>
+        <button class="btn btn-sm btn-outline-danger w-100" onclick="handleLogout()">
+          <i class="fa-solid fa-right-from-bracket me-1"></i> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <main class="admin-content">
+      
+      <!-- ========================================================= -->
+      <!-- TAB A: DASHBOARD ANALYTICS -->
+      <!-- ========================================================= -->
+      <section id="tab-analytics" class="admin-tab-view">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="fw-bold" style="font-family: 'Outfit', sans-serif;">Store Analytics Dashboard</h2>
+          <button class="btn btn-sm btn-outline-premium" onclick="loadAnalyticsData()">
+            <i class="fa-solid fa-rotate me-1"></i> Refresh Stats
+          </button>
+        </div>
+        
+        <!-- Summary widgets cards grid -->
+        <div class="row g-3 mb-4">
+          <!-- Widget 1: Revenue -->
+          <div class="col-md-6 col-lg-3">
+            <div class="glass-panel summary-widget">
+              <div class="widget-info">
+                <h4>Total Revenue</h4>
+                <p id="stat-revenue">₹0.00</p>
+              </div>
+              <div class="widget-icon text-success"><i class="fa-solid fa-sack-dollar"></i></div>
+            </div>
+          </div>
+          <!-- Widget 2: Profit -->
+          <div class="col-md-6 col-lg-3">
+            <div class="glass-panel summary-widget">
+              <div class="widget-info">
+                <h4>Est. Net Profit</h4>
+                <p id="stat-profit">₹0.00</p>
+              </div>
+              <div class="widget-icon text-primary"><i class="fa-solid fa-chart-line"></i></div>
+            </div>
+          </div>
+          <!-- Widget 3: Today sales -->
+          <div class="col-md-6 col-lg-3">
+            <div class="glass-panel summary-widget">
+              <div class="widget-info">
+                <h4>Today's Sales</h4>
+                <p id="stat-today">₹0.00</p>
+              </div>
+              <div class="widget-icon text-warning"><i class="fa-solid fa-calendar-day"></i></div>
+            </div>
+          </div>
+          <!-- Widget 4: Alerts -->
+          <div class="col-md-6 col-lg-3">
+            <div class="glass-panel summary-widget">
+              <div class="widget-info">
+                <h4>Stock Alerts</h4>
+                <p id="stat-alerts">0 / 0</p>
+              </div>
+              <div class="widget-icon text-danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts grid -->
+        <div class="row g-4 mb-4">
+          <div class="col-lg-8">
+            <div class="glass-panel p-4 h-100">
+              <h4 class="h5 fw-bold text-light mb-4"><i class="fa-solid fa-chart-line text-primary me-2"></i> Sales Revenue Trend (INR)</h4>
+              <div style="height: 280px; position: relative;">
+                <canvas id="salesTrendChart"></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-lg-4">
+            <div class="glass-panel p-4 h-100">
+              <h4 class="h5 fw-bold text-light mb-4"><i class="fa-solid fa-chart-pie text-warning me-2"></i> Payment Modes</h4>
+              <div style="height: 280px; position: relative;">
+                <canvas id="paymentsChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="glass-panel p-4">
+              <h4 class="h5 fw-bold text-light mb-4"><i class="fa-solid fa-ranking-star text-info me-2"></i> Top Brand Sales (Units)</h4>
+              <div style="height: 240px; position: relative;">
+                <canvas id="brandsChart"></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Low Stock Alert Grid widget -->
+          <div class="col-md-6">
+            <div class="glass-panel p-4 h-100">
+              <h4 class="h5 fw-bold text-light mb-3"><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i> Low & Out Of Stock Warnings</h4>
+              <div class="table-responsive" style="max-height: 240px; overflow-y: auto;">
+                <table class="table table-dark table-premium text-light" style="font-size: 0.8rem;">
+                  <thead>
+                    <tr>
+                      <th>Model</th>
+                      <th>Brand</th>
+                      <th>Qty Left</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="stat-low-stock-table">
+                    <!-- Low stock warnings populated via js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB B: INVENTORY MANAGEMENT -->
+      <!-- ========================================================= -->
+      <section id="tab-inventory" class="admin-tab-view d-none">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+          <h2 class="fw-bold" style="font-family: 'Outfit', sans-serif;">Smartphones Inventory</h2>
+          <button class="btn-primary-premium" onclick="showAddProductModal()">
+            <i class="fa-solid fa-circle-plus"></i> Add New Phone Model
+          </button>
+        </div>
+
+        <div class="glass-panel p-3 mb-4">
+          <div class="row g-2">
+            <div class="col-md-9">
+              <div class="position-relative">
+                <input type="text" id="inv-search-input" class="form-control form-control-premium ps-4 text-light" placeholder="Search models, brands, or specifications..." onkeyup="searchInventory()">
+                <i class="fa-solid fa-magnifying-glass text-muted position-absolute" style="top: 13px; left: 14px;"></i>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <select id="inv-brand-filter" class="form-select form-select-premium" onchange="filterInventory()">
+                <option value="">All Brands</option>
+                <option value="Apple">Apple</option>
+                <option value="Samsung">Samsung</option>
+                <option value="OnePlus">OnePlus</option>
+                <option value="Nothing">Nothing</option>
+                <option value="Redmi">Redmi</option>
+                <option value="Vivo">Vivo</option>
+                <option value="Oppo">Oppo</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inventory List -->
+        <div class="glass-panel p-4">
+          <div class="table-responsive">
+            <table class="table table-dark table-premium text-light w-100">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Model</th>
+                  <th>Brand</th>
+                  <th>Specs (RAM/Storage)</th>
+                  <th>Purchase Cost</th>
+                  <th>Selling Price</th>
+                  <th>Stock Qty</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-table-body">
+                <!-- Products loaded from DB -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB C: CUSTOMER MANAGEMENT (CRM) -->
+      <!-- ========================================================= -->
+      <section id="tab-customers" class="admin-tab-view d-none">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+          <h2 class="fw-bold" style="font-family: 'Outfit', sans-serif;">Customer Relationship Management (CRM)</h2>
+          <button class="btn-primary-premium" onclick="showAddCustomerModal()">
+            <i class="fa-solid fa-user-plus"></i> Add New Customer Profile
+          </button>
+        </div>
+
+        <div class="glass-panel p-3 mb-4">
+          <div class="position-relative">
+            <input type="text" id="crm-search-input" class="form-control form-control-premium ps-4 text-light" placeholder="Search customers by name, phone, email, address..." onkeyup="searchCRM()">
+            <i class="fa-solid fa-magnifying-glass text-muted position-absolute" style="top: 13px; left: 14px;"></i>
+          </div>
+        </div>
+
+        <div class="glass-panel p-4">
+          <div class="table-responsive">
+            <table class="table table-dark table-premium text-light w-100">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Customer Name</th>
+                  <th>Phone Number</th>
+                  <th>Email</th>
+                  <th>Address</th>
+                  <th>Registered Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="crm-table-body">
+                <!-- Customers loaded from DB -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB D: POS BILLING & SALES -->
+      <!-- ========================================================= -->
+      <section id="tab-billing" class="admin-tab-view d-none">
+        <h2 class="fw-bold mb-4" style="font-family: 'Outfit', sans-serif;">POS Point-of-Sale Billing</h2>
+
+        <div class="pos-container">
+          
+          <!-- Cart details, customer select & totals -->
+          <div class="d-flex flex-column gap-4">
+            
+            <!-- Customer Selector -->
+            <div class="glass-panel p-4">
+              <h4 class="h5 fw-bold text-light mb-3"><i class="fa-solid fa-circle-user text-primary me-2"></i> Customer Association</h4>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="pos-phone-lookup" class="form-label text-muted small">Lookup Phone Number</label>
+                  <div class="d-flex gap-2">
+                    <input type="tel" id="pos-phone-lookup" class="form-control form-control-premium" placeholder="e.g. 9876543210">
+                    <button class="btn btn-outline-premium" type="button" onclick="posLookupCustomer()"><i class="fa-solid fa-magnifying-glass"></i></button>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="pos-customer-name" class="form-label text-muted small">Customer Name</label>
+                  <input type="text" id="pos-customer-name" class="form-control form-control-premium" placeholder="Walk-in Customer">
+                </div>
+                
+                <div class="col-md-6 d-none" id="pos-cust-email-col">
+                  <label for="pos-customer-email" class="form-label text-muted small">Customer Email</label>
+                  <input type="email" id="pos-customer-email" class="form-control form-control-premium">
+                </div>
+                <div class="col-md-6 d-none" id="pos-cust-address-col">
+                  <label for="pos-customer-address" class="form-label text-muted small">Customer Address</label>
+                  <input type="text" id="pos-customer-address" class="form-control form-control-premium">
+                </div>
+              </div>
+              <div class="mt-2 text-end">
+                <button class="btn btn-link text-primary small p-0 text-decoration-none" onclick="togglePosCustomerDetails()" id="btn-toggle-pos-details">Add More Contact Info</button>
+              </div>
+            </div>
+
+            <!-- Cart Items Grid -->
+            <div class="glass-panel p-4">
+              <h4 class="h5 fw-bold text-light mb-3"><i class="fa-solid fa-shopping-cart text-primary me-2"></i> Selected Billing Items</h4>
+              
+              <div class="pos-cart-list" id="pos-cart-list">
+                <!-- Cart items added dynamically -->
+                <div class="text-center py-5 text-muted" id="cart-empty-msg">
+                  <i class="fa-solid fa-cart-shopping fs-2 mb-2"></i>
+                  <p>Billing cart is empty. Add phones from the sidebar search panel.</p>
+                </div>
+              </div>
+
+              <!-- Cart totals breakdown -->
+              <div class="mt-4 pt-3 border-top text-light" style="border-color: var(--border-color) !important;">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted">Subtotal (Selling Price):</span>
+                  <span class="fw-semibold" id="pos-subtotal">₹0.00</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="text-muted">Discount Coupon / Rebate (INR):</span>
+                  <input type="number" id="pos-discount" class="form-control form-control-premium py-1 px-2 text-end" style="max-width: 100px;" value="0" min="0" onchange="recalculateCartTotals()" onkeyup="recalculateCartTotals()">
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted">Calculated GST (18% inclusive):</span>
+                  <span class="fw-semibold" id="pos-gst">₹0.00</span>
+                </div>
+                <div class="d-flex justify-content-between mt-3 pt-2 border-top fs-5" style="border-color: var(--border-color) !important;">
+                  <strong class="text-light">Grand Net Total:</strong>
+                  <strong class="text-warning" id="pos-grand-total">₹0.00</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Details & Submit -->
+            <div class="glass-panel p-4">
+              <div class="row g-3 align-items-center">
+                <div class="col-sm-6">
+                  <label for="pos-payment-mode" class="form-label text-muted small">Payment Settlement Mode</label>
+                  <select id="pos-payment-mode" class="form-select form-select-premium" onchange="togglePosPaymentDetails()">
+                    <option value="Cash">Cash Handover</option>
+                    <option value="UPI">Direct UPI Wallet</option>
+                    <option value="PhonePe">PhonePe QR code</option>
+                    <option value="Google Pay">Google Pay QR code</option>
+                    <option value="Paytm">Paytm Transfer</option>
+                  </select>
+                </div>
+                
+                <div class="col-sm-6">
+                  <button class="btn-gold-premium w-100 py-3 mt-3 mt-sm-0 justify-content-center" onclick="submitPosInvoice()">
+                    <i class="fa-solid fa-cash-register"></i> Complete Sale & Bill
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Products Sidebar Lookup Selector -->
+          <div class="glass-panel p-4">
+            <h4 class="h5 fw-bold text-light mb-3"><i class="fa-solid fa-magnifying-glass-plus text-primary me-2"></i> Catalog Selector</h4>
+            
+            <div class="mb-3">
+              <input type="text" id="pos-prod-search" class="form-control form-control-premium py-2" placeholder="Search phone name/specs..." onkeyup="searchPosProducts()">
+            </div>
+
+            <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+              <table class="table table-dark table-premium text-light" style="font-size: 0.82rem;">
+                <thead>
+                  <tr>
+                    <th>Model</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Select</th>
+                  </tr>
+                </thead>
+                <tbody id="pos-product-search-results">
+                  <!-- Search lists loaded via javascript -->
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- QR Payment Section dynamic container -->
+            <div id="pos-qr-section" class="mt-4 pt-3 border-top d-none" style="border-color: var(--border-color) !important;">
+              <div class="qr-container">
+                <h5 class="h6 fw-bold text-light mb-2">Scan & Pay via UPI</h5>
+                <div class="qr-box">
+                  <!-- Generated QR dynamic code box -->
+                  <i class="fa-solid fa-qrcode text-dark fs-1" id="dynamic-qr-image" style="transform: scale(2.2); margin: auto;"></i>
+                </div>
+                <p class="small text-muted mb-0">Merchant: <strong>PRIYAM MOBILES</strong></p>
+                <p class="small text-warning mb-0" id="qr-val-amount">Amount: ₹0.00</p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB E: SERVICE BOARD (REPAIRS) -->
+      <!-- ========================================================= -->
+      <section id="tab-services" class="admin-tab-view d-none">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+          <h2 class="fw-bold" style="font-family: 'Outfit', sans-serif;">Mobile Repairs Service Center Board</h2>
+          <button class="btn-primary-premium" onclick="showAddRepairModal()">
+            <i class="fa-solid fa-screwdriver-wrench"></i> Create Repair Request
+          </button>
+        </div>
+
+        <div class="glass-panel p-4">
+          <div class="table-responsive">
+            <table class="table table-dark table-premium text-light w-100">
+              <thead>
+                <tr>
+                  <th>Request ID</th>
+                  <th>Customer</th>
+                  <th>Phone Number</th>
+                  <th>Device Model</th>
+                  <th>Issue Details</th>
+                  <th>Est. Cost</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="services-table-body">
+                <!-- Repairs loaded from DB -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB F: MARKETING HUB -->
+      <!-- ========================================================= -->
+      <section id="tab-marketing" class="admin-tab-view d-none">
+        <h2 class="fw-bold mb-4" style="font-family: 'Outfit', sans-serif;">Marketing Campaign Hub</h2>
+
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="glass-panel p-4 h-100">
+              <h4 class="h5 fw-bold text-light mb-4"><i class="fa-solid fa-paper-plane text-primary me-2"></i> Launch Marketing Campaign</h4>
+              
+              <form id="marketing-campaign-form" onsubmit="triggerMarketingCampaign(event)">
+                <div class="mb-3">
+                  <label for="campaign-type" class="form-label text-muted small">Campaign Delivery Channel</label>
+                  <select id="campaign-type" class="form-select form-select-premium">
+                    <option value="WhatsApp">WhatsApp Promotions (Interactive Links)</option>
+                    <option value="SMS">Standard Bulk SMS Carrier</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="campaign-audience" class="form-label text-muted small">Target Customer Group</label>
+                  <select id="campaign-audience" class="form-select form-select-premium">
+                    <option value="test">Single Test Run (First customer in DB)</option>
+                    <option value="recent_buyers">Recent Buyers (Purchased in the last 30 days)</option>
+                    <option value="all">All Registered Customer Accounts</option>
+                  </select>
+                </div>
+
+                <div class="mb-4">
+                  <label for="campaign-message" class="form-label text-muted small">Promotional Message Body</label>
+                  <textarea id="campaign-message" class="form-control form-control-premium" rows="6" required placeholder="Write campaign text here..."></textarea>
+                  <div class="form-text text-muted small mt-1">Include variables e.g., discount coupons, link to store index, festival offers details.</div>
+                </div>
+
+                <button type="submit" class="btn-primary-premium w-100 py-2.5 justify-content-center">
+                  <i class="fa-solid fa-circle-play"></i> Dispatch Simulated Campaign
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="glass-panel p-4 h-100">
+              <h4 class="h5 fw-bold text-light mb-4"><i class="fa-solid fa-bars-staged text-warning me-2"></i> Campaign Delivery Logs</h4>
+              <div id="marketing-logs" class="bg-dark-navy p-3 rounded-4 border-glass-dark text-muted" style="min-height: 250px; font-family: monospace; font-size: 0.8rem; overflow-y: auto; max-height: 380px;">
+                [SYSTEM LOGS] Awaiting campaign dispatch execution triggers...
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB G: REPORTS MODULE -->
+      <!-- ========================================================= -->
+      <section id="tab-reports" class="admin-tab-view d-none">
+        <h2 class="fw-bold mb-4" style="font-family: 'Outfit', sans-serif;">Reports & Data Export Module</h2>
+
+        <div class="row g-4">
+          <!-- Sales Reports card -->
+          <div class="col-md-6 col-lg-4">
+            <div class="glass-panel p-4 h-100 d-flex flex-column justify-content-between">
+              <div>
+                <div class="fs-1 text-success mb-3"><i class="fa-solid fa-file-invoice"></i></div>
+                <h4 class="h5 fw-bold text-light mb-2">Detailed Sales Log</h4>
+                <p class="text-muted small">Exports all invoice logs, transaction values, GST collections, and discounts applied.</p>
+              </div>
+              <div class="mt-4">
+                <button class="btn-primary-premium w-100 justify-content-center" onclick="exportReport('sales')">
+                  <i class="fa-solid fa-file-excel"></i> Export to Excel/CSV
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inventory Reports card -->
+          <div class="col-md-6 col-lg-4">
+            <div class="glass-panel p-4 h-100 d-flex flex-column justify-content-between">
+              <div>
+                <div class="fs-1 text-primary mb-3"><i class="fa-solid fa-boxes-packing"></i></div>
+                <h4 class="h5 fw-bold text-light mb-2">Inventory Stock Valuation</h4>
+                <p class="text-muted small">Exports stock quantities, unit purchase price vs selling values, specs details, and total assets valuation.</p>
+              </div>
+              <div class="mt-4">
+                <button class="btn-primary-premium w-100 justify-content-center" onclick="exportReport('inventory')">
+                  <i class="fa-solid fa-file-excel"></i> Export to Excel/CSV
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Repair Service Report card -->
+          <div class="col-md-6 col-lg-4">
+            <div class="glass-panel p-4 h-100 d-flex flex-column justify-content-between">
+              <div>
+                <div class="fs-1 text-warning mb-3"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                <h4 class="h5 fw-bold text-light mb-2">Repair Requests Report</h4>
+                <p class="text-muted small">Exports mobile repair tickets, device model logs, repair diagnostic status, and service invoice collections.</p>
+              </div>
+              <div class="mt-4">
+                <button class="btn-primary-premium w-100 justify-content-center" onclick="exportReport('services')">
+                  <i class="fa-solid fa-file-excel"></i> Export to Excel/CSV
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODALS CONTAINER -->
+  <!-- ========================================================= -->
+
+  <!-- Modal A: Add/Edit Product -->
+  <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content glass-panel text-light border-glass-dark" style="background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(15px);">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title fw-bold text-light" id="productModalLabel">Add Phone Model</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="product-form" onsubmit="saveProduct(event)">
+            <input type="hidden" id="prod-id">
+            
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="prod-brand" class="form-label text-muted small">Brand *</label>
+                <input type="text" class="form-control form-control-premium" id="prod-brand" required placeholder="e.g. Apple">
+              </div>
+              <div class="col-md-6">
+                <label for="prod-model" class="form-label text-muted small">Model Name *</label>
+                <input type="text" class="form-control form-control-premium" id="prod-model" required placeholder="e.g. iPhone 15 Pro Max">
+              </div>
+
+              <div class="col-md-3">
+                <label for="prod-ram" class="form-label text-muted small">RAM *</label>
+                <input type="text" class="form-control form-control-premium" id="prod-ram" required placeholder="e.g. 8GB">
+              </div>
+              <div class="col-md-3">
+                <label for="prod-storage" class="form-label text-muted small">Storage *</label>
+                <input type="text" class="form-control form-control-premium" id="prod-storage" required placeholder="e.g. 256GB">
+              </div>
+              <div class="col-md-3">
+                <label for="prod-battery" class="form-label text-muted small">Battery Capacity</label>
+                <input type="text" class="form-control form-control-premium" id="prod-battery" placeholder="e.g. 4441 mAh">
+              </div>
+              <div class="col-md-3">
+                <label for="prod-warranty" class="form-label text-muted small">Warranty *</label>
+                <input type="text" class="form-control form-control-premium" id="prod-warranty" required value="1 Year">
+              </div>
+
+              <div class="col-md-6">
+                <label for="prod-camera" class="form-label text-muted small">Camera Specs</label>
+                <input type="text" class="form-control form-control-premium" id="prod-camera" placeholder="e.g. 48MP + 12MP + 12MP">
+              </div>
+              <div class="col-md-6">
+                <label for="prod-processor" class="form-label text-muted small">Processor Chip</label>
+                <input type="text" class="form-control form-control-premium" id="prod-processor" placeholder="e.g. A17 Pro">
+              </div>
+
+              <div class="col-md-6">
+                <label for="prod-imei" class="form-label text-muted small">IMEI Number</label>
+                <input type="text" class="form-control form-control-premium" id="prod-imei" placeholder="15 Digit IMEI number">
+              </div>
+              <div class="col-md-6">
+                <label for="prod-image-url" class="form-label text-muted small">Product Image (URL Link)</label>
+                <input type="text" class="form-control form-control-premium" id="prod-image-url" placeholder="https://unsplash.com/...">
+              </div>
+
+              <div class="col-md-4">
+                <label for="prod-purchase" class="form-label text-muted small">Purchase Cost (INR) *</label>
+                <input type="number" class="form-control form-control-premium" id="prod-purchase" required min="0">
+              </div>
+              <div class="col-md-4">
+                <label for="prod-selling" class="form-label text-muted small">Showroom Price (INR) *</label>
+                <input type="number" class="form-control form-control-premium" id="prod-selling" required min="0">
+              </div>
+              <div class="col-md-4">
+                <label for="prod-quantity" class="form-label text-muted small">Available Stock Qty *</label>
+                <input type="number" class="form-control form-control-premium" id="prod-quantity" required min="0" value="0">
+              </div>
+            </div>
+            
+            <div class="modal-footer border-top-0 px-0 pb-0 mt-4">
+              <button type="button" class="btn btn-outline-premium" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn-primary-premium">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal B: Add/Edit Customer -->
+  <div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content glass-panel text-light border-glass-dark" style="background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(15px);">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title fw-bold text-light" id="customerModalLabel">New Customer Account</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="customer-form" onsubmit="saveCustomer(event)">
+            <input type="hidden" id="cust-id">
+            
+            <div class="mb-3">
+              <label for="cust-name" class="form-label text-muted small">Customer Name *</label>
+              <input type="text" class="form-control form-control-premium" id="cust-name" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="cust-phone" class="form-label text-muted small">Phone Number *</label>
+              <input type="tel" class="form-control form-control-premium" id="cust-phone" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="cust-email" class="form-label text-muted small">Email Address</label>
+              <input type="email" class="form-control form-control-premium" id="cust-email">
+            </div>
+
+            <div class="mb-4">
+              <label for="cust-address" class="form-label text-muted small">Address</label>
+              <textarea class="form-control form-control-premium" id="cust-address" rows="3"></textarea>
+            </div>
+
+            <div class="modal-footer border-top-0 px-0 pb-0">
+              <button type="button" class="btn btn-outline-premium" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn-primary-premium">Save Profile</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal C: Add/Edit Service request -->
+  <div class="modal fade" id="repairModal" tabindex="-1" aria-labelledby="repairModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content glass-panel text-light border-glass-dark" style="background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(15px);">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title fw-bold text-light" id="repairModalLabel">Submit Repair Work Order</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="repair-form" onsubmit="saveRepair(event)">
+            <input type="hidden" id="repair-id">
+            
+            <div class="mb-3" id="repair-id-display-col">
+              <label class="form-label text-muted small">Repair Request ID</label>
+              <input type="text" class="form-control form-control-premium" id="repair-id-val" readonly>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-md-6">
+                <label for="repair-cust-name" class="form-label text-muted small">Customer Name *</label>
+                <input type="text" class="form-control form-control-premium" id="repair-cust-name" required>
+              </div>
+              <div class="col-md-6">
+                <label for="repair-cust-phone" class="form-label text-muted small">Phone Number *</label>
+                <input type="tel" class="form-control form-control-premium" id="repair-cust-phone" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="repair-device" class="form-label text-muted small">Device Model *</label>
+              <input type="text" class="form-control form-control-premium" id="repair-device" required placeholder="e.g. Samsung A54">
+            </div>
+
+            <div class="mb-3">
+              <label for="repair-issue" class="form-label text-muted small">Issue Description *</label>
+              <textarea class="form-control form-control-premium" id="repair-issue" rows="3" required></textarea>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-md-6">
+                <label for="repair-est-cost" class="form-label text-muted small">Estimated Repair Cost (INR)</label>
+                <input type="number" class="form-control form-control-premium" id="repair-est-cost" value="0">
+              </div>
+              <div class="col-md-6">
+                <label for="repair-status" class="form-label text-muted small">Progress Status</label>
+                <select id="repair-status" class="form-select form-select-premium">
+                  <option value="Pending">Pending Assignment</option>
+                  <option value="Under Repair">Under Repair</option>
+                  <option value="Ready for Collection">Ready for Collection</option>
+                  <option value="Delivered">Delivered & Closed</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-3 d-none" id="repair-actual-cost-col">
+              <label for="repair-actual-cost" class="form-label text-muted small">Final Settled Cost (INR)</label>
+              <input type="number" class="form-control form-control-premium" id="repair-actual-cost" value="0">
+            </div>
+
+            <div class="mb-4">
+              <label for="repair-comments" class="form-label text-muted small">Technician Diagnosis Comments</label>
+              <textarea class="form-control form-control-premium" id="repair-comments" rows="3"></textarea>
+            </div>
+
+            <div class="modal-footer border-top-0 px-0 pb-0">
+              <button type="button" class="btn btn-outline-premium" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn-primary-premium">Submit Ticket</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal D: Customer History View -->
+  <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content glass-panel text-light border-glass-dark" style="background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(15px);">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title fw-bold text-light" id="historyModalLabel">Purchase Log for Customer</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive" style="max-height: 400px;">
+            <table class="table table-dark table-premium text-light w-100">
+              <thead>
+                <tr>
+                  <th>Invoice No</th>
+                  <th>Date</th>
+                  <th>Purchased Item</th>
+                  <th>Qty</th>
+                  <th>Total Billing</th>
+                  <th>Paid Mode</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <!-- Loaded via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal E: Printable Invoice Bill -->
+  <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content text-dark bg-white">
+        <div class="modal-header border-bottom-0 no-print">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+        <div class="modal-body p-4" id="invoice-print-area">
+          <div class="text-center mb-4">
+            <h3 class="fw-bold mb-0">PRIYAM MOBILES</h3>
+            <p class="small text-muted mb-0">Perumulai, Titakudi, Tamil Nadu, India</p>
+            <p class="small text-muted mb-0">Ph: +91 7639568348 | +91 9655493084</p>
+            <hr>
+            <h5 class="fw-bold">RETAIL INVOICE</h5>
+          </div>
+
+          <div class="d-flex justify-content-between mb-3 text-muted small">
+            <div>
+              <p class="mb-0"><strong>Customer Info:</strong></p>
+              <p class="mb-0" id="inv-show-cust-name">Walk-in Customer</p>
+              <p class="mb-0" id="inv-show-cust-phone">N/A</p>
+            </div>
+            <div class="text-end">
+              <p class="mb-0">Invoice: <strong id="inv-show-number">PM-INV-0000</strong></p>
+              <p class="mb-0">Date: <span id="inv-show-date">12-Jun-2026</span></p>
+            </div>
+          </div>
+
+          <table class="table table-sm text-dark table-bordered" style="font-size: 0.85rem;">
+            <thead class="table-light">
+              <tr>
+                <th>Item Details</th>
+                <th class="text-center">Qty</th>
+                <th class="text-end">Unit Price</th>
+                <th class="text-end">Total</th>
+              </tr>
+            </thead>
+            <tbody id="inv-show-items-body">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+
+          <div class="row justify-content-end text-end small">
+            <div class="col-7">
+              <p class="mb-1">Subtotal:</p>
+              <p class="mb-1">Discount Coupon:</p>
+              <p class="mb-1">Inclusive GST (18%):</p>
+              <h6 class="fw-bold mt-1">Grand Net Total:</h6>
+            </div>
+            <div class="col-5">
+              <p class="mb-1" id="inv-show-subtotal">₹0.00</p>
+              <p class="mb-1" id="inv-show-discount">₹0.00</p>
+              <p class="mb-1" id="inv-show-gst">₹0.00</p>
+              <h6 class="fw-bold mt-1" id="inv-show-grand">₹0.00</h6>
+            </div>
+          </div>
+
+          <hr>
+          <div class="text-center mb-3">
+            <p class="small text-muted mb-1">Payment settled via: <strong id="inv-show-mode">Cash</strong></p>
+            <p class="small text-muted mb-0">Thank you for choosing Priyam Mobiles!</p>
+            <p class="small text-muted mb-0">Original accessories are warranted by manufacturers.</p>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top-0 no-print">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Invoice</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Admin scripts panel -->
+  <script src="js/admin.js"></script>
+</body>
+</html>
