@@ -17,51 +17,8 @@
       "created_at": "2026-06-12T02:39:20.832Z"
     }
   ],
-  "products": [
-    {
-      "id": 1,
-      "brand": "Nothing",
-      "model": "Nothing Phone",
-      "ram": "16GB",
-      "storage": "512GB",
-      "battery": "4700 mAh",
-      "camera": "50MP + 50MP",
-      "processor": "Snapdragon 8+ Gen 1",
-      "imei": "359456789123456",
-      "purchase_price": 12999,
-      "selling_price": 12599,
-      "quantity": 1,
-      "warranty": "1 Year",
-      "image_url": "https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=600&auto=format&fit=crop&q=60",
-      "created_at": "2026-06-15T04:55:39.061Z"
-    }
-  ],
-  "customers": [
-    {
-      "id": 1,
-      "name": "Rajesh Kumar",
-      "phone": "9876543210",
-      "email": "rajesh@gmail.com",
-      "address": "12 Main St, Perumulai, Titakudi",
-      "created_at": "2026-06-12T02:39:20.832Z"
-    },
-    {
-      "id": 2,
-      "name": "Priya Dharshini",
-      "phone": "8765432109",
-      "email": "priyamxx@gmail.com",
-      "address": "24 Gandhi Nagar, Titakudi",
-      "created_at": "2026-06-12T02:39:20.832Z"
-    },
-    {
-      "id": 3,
-      "name": "Vignesh S",
-      "phone": "7654321098",
-      "email": "vignesh@outlook.com",
-      "address": "5 Temple View Rd, Perumulai",
-      "created_at": "2026-06-12T02:39:20.832Z"
-    }
-  ],
+  "products": [],
+  "customers": [],
   "sales": [
     {
       "id": 1,
